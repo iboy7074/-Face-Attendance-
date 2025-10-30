@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block content %}
+<section>
+  <h2>Classes</h2>
+  <ul>
+    {% for c in classes %}
+      <li>{{ c.name }} ({{ c.code }}) — <a href="/enroll?class_id={{ c.id }}">Enroll</a> | <a href="/recognize?class_id={{ c.id }}">Recognize</a></li>
+    {% else %}
+      <li>No classes yet.</li>
+    {% endfor %}
+  </ul>
+  <h3>Create Class</h3>
+  <form method="post" action="/admin/class/create">
+    <input name="name" placeholder="Class name" required />
+    <input name="code" placeholder="Code" required />
+    <button type="submit">Create</button>
+  </form>
+</section>
+{% endblock %}

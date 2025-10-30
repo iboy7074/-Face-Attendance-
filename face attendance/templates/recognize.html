@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Recognize / Mark Attendance</h2>
+<form id="rec-form">
+  <label>Class:
+    <select name="class_id">
+      <option value="">(Any)</option>
+      {% for c in classes %}
+        <option value="{{ c.id }}" {% if class_id and class_id == c.id %}selected{% endif %}>{{ c.name }} ({{ c.code }})</option>
+      {% endfor %}
+    </select>
+  </label>
+</form>
+<div>
+  <video id="video" autoplay playsinline></video>
+  <canvas id="canvas" style="display:none"></canvas>
+</div>
+<p id="out"></p>
+<script src="/static/js/camera.js"></script>
+<script>
+  setupCamera('video');
+  let busy = false;
+  async function tick(){
+    if(busy) return;
+    busy = true;
+    const blob = await captureFrame('video','canvas');
+    const form = new FormData(document.getElementById('rec-form'));
+    form.append('file', blob, 'frame.jpg');
+    try{
+      const res = await fetch('/api/recognize_frame', {method:'POST', body: form});
+      const j = await res.json();
+      if(j.recognized && j.recognized.length){
+        document.getElementById('out').textContent = 'Recognized: ' + j.recognized.map(r=>`${r.name} (${r.student_id})`).join(', ');
+      }
+    }catch(e){}
+    busy = false;
+  }
+  setInterval(tick, 1200);
+</script>
+{% endblock %}

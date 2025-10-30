@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Admin Logs</h2>
+<form method="get" action="/admin/logs">
+  <label>Class:
+    <select name="class_id">
+      <option value="">(Any)</option>
+      {% for c in classes %}
+        <option value="{{ c.id }}" {% if class_id and class_id == c.id %}selected{% endif %}>{{ c.name }} ({{ c.code }})</option>
+      {% endfor %}
+    </select>
+  </label>
+  <label>Date: <input name="day" type="date" value="{{ day or '' }}" /></label>
+  <button type="submit">Filter</button>
+  <a href="/admin/export?class_id={{ class_id or '' }}&day={{ day or '' }}">Export CSV</a>
+</form>
+<table>
+  <thead><tr><th>Date</th><th>Class</th><th>Student</th><th>Name</th><th>Time</th><th>Confidence</th><th>Liveness</th></tr></thead>
+  <tbody>
+    {% for att, stu, ses in rows %}
+      <tr>
+        <td>{{ ses.session_date }}</td>
+        <td>{{ ses.class_id }}</td>
+        <td>{{ stu.student_id }}</td>
+        <td>{{ stu.name }}</td>
+        <td>{{ att.recognized_at }}</td>
+        <td>{{ '%.3f'|format(att.confidence) }}</td>
+        <td>{{ 'Yes' if att.liveness_passed else 'No' }}</td>
+      </tr>
+    {% else %}
+      <tr><td colspan="7">No records.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

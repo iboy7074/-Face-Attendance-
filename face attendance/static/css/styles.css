@@ -1,0 +1,6 @@
+body{font-family:sans-serif;max-width:900px;margin:0 auto;padding:1rem}
+header{display:flex;align-items:center;gap:1rem}
+nav a{margin-right:1rem}
+video{max-width:100%;border:1px solid #ddd;border-radius:8px}
+table{width:100%;border-collapse:collapse;margin-top:1rem}
+th,td{border:1px solid #ddd;padding:6px}

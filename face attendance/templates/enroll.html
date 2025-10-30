@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Enroll Student</h2>
+<form id="enroll-form">
+  <input name="name" placeholder="Full name" required />
+  <input name="student_id" placeholder="Student ID" required />
+  <label>Class:
+    <select name="class_id">
+      <option value="">(None)</option>
+      {% for c in classes %}
+        <option value="{{ c.id }}" {% if class_id and class_id == c.id %}selected{% endif %}>{{ c.name }} ({{ c.code }})</option>
+      {% endfor %}
+    </select>
+  </label>
+  <label><input type="checkbox" name="consent" required /> I consent to biometric processing for attendance.</label>
+  <div>
+    <video id="video" autoplay playsinline></video>
+    <canvas id="canvas" style="display:none"></canvas>
+  </div>
+  <button type="button" id="capture">Capture & Enroll</button>
+</form>
+<p id="msg"></p>
+<script src="/static/js/camera.js"></script>
+<script>
+  setupCamera('video');
+  document.getElementById('capture').onclick = async () => {
+    const blob = await captureFrame('video','canvas');
+    const form = new FormData(document.getElementById('enroll-form'));
+    form.append('file', blob, 'frame.jpg');
+    const res = await fetch('/api/enroll', { method: 'POST', body: form });
+    const j = await res.json();
+    document.getElementById('msg').textContent = j.ok ? 'Enrolled!' : ('Error: ' + (j.error||'failed'));
+  };
+</script>
+{% endblock %}
